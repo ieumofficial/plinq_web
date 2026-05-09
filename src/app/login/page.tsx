@@ -837,12 +837,18 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <a
-                href="plinq://open"
-                className="w-full bg-white border border-[#E6EAEE] rounded-[10px] px-4 py-3 text-[#16242E] text-[12px] font-semibold hover:bg-white/90 transition-colors text-center block"
+              <button
+                type="button"
+                onClick={async () => {
+                  const { data: { session } } = await supabase.auth.getSession();
+                  if (session) {
+                    window.location.href = `plinq://auth?access_token=${session.access_token}&refresh_token=${session.refresh_token}`;
+                  }
+                }}
+                className="w-full bg-white border border-[#E6EAEE] rounded-[10px] px-4 py-3 text-[#16242E] text-[12px] font-semibold hover:bg-white/90 transition-colors text-center cursor-pointer"
               >
                 Open the desktop app
-              </a>
+              </button>
 
               <p className="text-[12px] text-[#94A0AA]">
                 Not {email}?{" "}
