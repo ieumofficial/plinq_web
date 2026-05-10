@@ -1,7 +1,12 @@
 import Link from "next/link";
 import Logo from "./Logo";
 
-const navItems = ["Product", "Solutions", "Pricing", "Docs"];
+const navItems: { label: string; href: string }[] = [
+  { label: "Product", href: "/#product" },
+  { label: "Solutions", href: "/#solution" },
+  { label: "Pricing", href: "#" },
+  { label: "Docs", href: "/docs" },
+];
 
 export default function Header() {
   return (
@@ -13,18 +18,18 @@ export default function Header() {
       <nav className="hidden md:flex items-center gap-[60px]">
         {navItems.map((item) => (
           <a
-            key={item}
-            href="#"
+            key={item.label}
+            href={item.href}
             className="text-[#6B7B86] text-sm font-semibold hover:text-[#16242E] transition-colors"
           >
-            {item}
+            {item.label}
           </a>
         ))}
       </nav>
 
       <Link
         href="/login"
-        className="bg-white border border-[#E6EAEE] rounded-[10px] px-[25px] py-[10px] text-[#16242E] text-xs hover:bg-[#F8F9FA] transition-colors"
+        className="bg-white border border-[#E6EAEE] rounded-[5px] px-[25px] py-[10px] text-[#16242E] text-[12px] hover:bg-[#F8F9FA] transition-colors"
       >
         Sign in
       </Link>
