@@ -1,4 +1,8 @@
+import Link from "next/link";
 import Header from "@/components/Header";
+import Logo from "@/components/Logo";
+import ProductSection from "@/components/ProductSection";
+import AppPreviewMockup from "@/components/AppPreviewMockup";
 
 function WindowsIcon() {
   return (
@@ -24,133 +28,6 @@ function SparkleIcon() {
   );
 }
 
-function AppPreviewMockup() {
-  return (
-    <div className="w-full max-w-[900px] mx-auto mt-12 sm:mt-16">
-      <div className="bg-[#F8FAFB] rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-[#E6EAEE] overflow-hidden">
-        <div className="flex min-h-[400px] sm:min-h-[480px]">
-          {/* Sidebar */}
-          <div className="hidden sm:flex w-[200px] bg-[#2E434E] flex-col p-4 gap-3 shrink-0">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-[#6BA7CC] flex items-center justify-center">
-                <span className="text-white text-xs font-semibold">T</span>
-              </div>
-              <span className="text-white text-sm font-semibold">plinq</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              {["Dashboard", "Projects", "Calendar", "Meetings", "Tasks"].map((item, i) => (
-                <div
-                  key={item}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium ${
-                    i === 0
-                      ? "bg-white/15 text-white"
-                      : "text-white/60 hover:text-white/80"
-                  }`}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-auto flex flex-col gap-1">
-              <div className="px-3 py-2 text-white/40 text-xs">Settings</div>
-              <div className="px-3 py-2 text-white/40 text-xs">Help</div>
-            </div>
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1 p-4 sm:p-6 flex flex-col gap-4 min-w-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-[#16242E]">Good morning, Alex</h3>
-                <p className="text-xs text-[#94A0AA] mt-0.5">3 tasks need your attention today</p>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-[#DDE7F4] flex items-center justify-center">
-                <span className="text-xs font-semibold text-[#2D5A9E]">A</span>
-              </div>
-            </div>
-
-            {/* Active Projects */}
-            <div>
-              <p className="text-xs font-semibold text-[#6B7B86] uppercase tracking-wide mb-3">Active Projects</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  { name: "Apollo", progress: 72, color: "#2D5A9E" },
-                  { name: "Pricing V2", progress: 48, color: "#8A5A1E" },
-                  { name: "Design System", progress: 91, color: "#2F6B45" },
-                ].map((project) => (
-                  <div key={project.name} className="bg-white rounded-xl p-3 border border-[#E6EAEE]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold text-[#16242E]">{project.name}</span>
-                      <span className="text-xs font-semibold" style={{ color: project.color }}>
-                        {project.progress}%
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#EBEFF2] rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${project.progress}%`,
-                          backgroundColor: project.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Pending Tasks */}
-            <div>
-              <p className="text-xs font-semibold text-[#6B7B86] uppercase tracking-wide mb-3">Pending Tasks</p>
-              <div className="flex flex-col gap-2">
-                {[
-                  { task: "Finalize API contracts for auth module", dot: "#2D5A9E", tag: "Apollo" },
-                  { task: "Review pricing tier comparison table", dot: "#8A5A1E", tag: "Pricing V2" },
-                  { task: "Update color token documentation", dot: "#2F6B45", tag: "Design System" },
-                  { task: "Schedule sprint retrospective", dot: "#9B3838", tag: "Apollo" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2.5 bg-white rounded-lg px-3 py-2 border border-[#E6EAEE]">
-                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.dot }} />
-                    <span className="text-xs text-[#16242E] flex-1 min-w-0 truncate">{item.task}</span>
-                    <span className="text-[10px] text-[#94A0AA] font-medium shrink-0">{item.tag}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* AI Follow-up panel */}
-          <div className="hidden md:flex w-[220px] bg-[#1F2F38] flex-col p-4 gap-3 shrink-0">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-5 h-5 rounded bg-[#2D5A9E] flex items-center justify-center">
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                  <path d="M6 0L7.4 4.6L12 6L7.4 7.4L6 12L4.6 7.4L0 6L4.6 4.6L6 0Z" fill="white"/>
-                </svg>
-              </div>
-              <span className="text-white text-xs font-semibold">AI Follow-up</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              {[
-                "From yesterday's standup: API auth deadline moved to Friday",
-                "Pricing V2 meeting had 3 unresolved items",
-                "Design System tokens updated by Sarah — review pending",
-              ].map((msg, i) => (
-                <div key={i} className="bg-white/8 rounded-lg p-2.5">
-                  <p className="text-[10px] text-white/70 leading-relaxed">{msg}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-auto">
-              <div className="bg-white/8 rounded-lg p-2.5 flex items-center gap-2">
-                <span className="text-[10px] text-white/40 flex-1">Ask about your projects...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Home() {
   return (
@@ -159,49 +36,79 @@ export default function Home() {
 
       {/* Center content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 py-12 sm:py-16">
-        <div className="flex flex-col items-center text-center max-w-[800px]">
-          {/* Badge */}
-          <div className="flex flex-col items-center gap-2 mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#DDE7F4] rounded-full px-4 py-1.5">
-              <SparkleIcon />
-              <span className="text-[#2D5A9E] text-xs font-semibold tracking-wide">NOW IN PRIVATE BETA</span>
+        <div className="flex flex-col items-center text-center max-w-[1054px]">
+          {/* Badge row — chip + AI follow-up label inline */}
+          <div
+            className="hero-rise flex flex-col sm:flex-row items-center gap-3 sm:gap-[15px] mb-5 sm:mb-6"
+            style={{ animationDelay: "0ms" }}
+          >
+            <div className="inline-flex items-center gap-[3px] bg-[#DDE7F4] rounded-[2px] px-[5px] py-[3px]">
+              <span className="animate-sparkle inline-flex">
+                <SparkleIcon />
+              </span>
+              <span className="text-[#2D5A9E] text-[9.16px] font-semibold tracking-[0.916px] uppercase whitespace-nowrap">
+                Now in private beta
+              </span>
             </div>
-            <p className="text-[#6B7B86] text-sm tracking-wide">AI FOLLOW-UP FOR EVERY MEETING</p>
+            <p className="text-[#94A0AA] text-[12px] tracking-[2px] uppercase whitespace-nowrap font-medium">
+              AI follow-up for every meeting
+            </p>
           </div>
 
           {/* Hero heading */}
           <h1
-            className="text-3xl sm:text-4xl md:text-[48px] md:leading-[56px] font-medium text-[#16242E] mb-5 sm:mb-6"
-            style={{ fontFamily: "Metropolis, Inter, sans-serif" }}
+            className="hero-rise text-[34px] leading-[1.15] sm:text-[44px] sm:leading-[1.18] md:text-[55px] md:leading-[1.2] font-medium text-[#16242E] tracking-[-0.04em] mb-8 sm:mb-10"
+            style={{
+              fontFamily: "Metropolis, Inter, sans-serif",
+              animationDelay: "90ms",
+            }}
           >
-            The dashboard that{" "}
-            <em className="not-italic italic text-[#2D5A9E]" style={{ fontFamily: "Metropolis, Inter, sans-serif", fontStyle: "italic" }}>
-              actually
-            </em>{" "}
-            finishes the work after the meeting.
+            <span className="block">
+              The dashboard that{" "}
+              <em
+                className="not-italic italic text-[#2D5A9E]"
+                style={{
+                  fontFamily: "Metropolis, Inter, sans-serif",
+                  fontStyle: "italic",
+                }}
+              >
+                actually
+              </em>{" "}
+              finishes
+            </span>
+            <span className="block">the work after the meeting.</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-[#6B7B86] text-sm sm:text-base leading-relaxed max-w-[640px] mb-8 sm:mb-10">
+          <p
+            className="hero-rise text-[#6B7B86] text-base sm:text-[18px] leading-[1.5] max-w-[820px] mb-7 sm:mb-8 tracking-[0.18px]"
+            style={{ animationDelay: "180ms" }}
+          >
             plinq reads your meetings, reconciles them with your roadmap, and tells you exactly what to ship today
             — across personal, team, project, and organization views.
           </p>
 
           {/* Download buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 mb-5">
-            <button className="flex items-center gap-2.5 bg-[#2E434E] text-white rounded-[5px] px-6 py-3 text-sm font-semibold hover:bg-[#3A5162] transition-colors w-full sm:w-auto justify-center">
+          <div
+            className="hero-rise flex flex-col sm:flex-row items-center gap-3 sm:gap-[20px] mb-5 sm:mb-6"
+            style={{ animationDelay: "270ms" }}
+          >
+            <button className="btn-sweep flex items-center gap-[5px] bg-[#2E434E] text-[#F8F9FA] rounded-[5px] px-[15px] py-[10px] text-[12px] font-semibold hover:bg-[#3A5162] transition-colors justify-center min-w-[180px]">
               <WindowsIcon />
               Download for Windows
             </button>
-            <button className="flex items-center gap-2.5 bg-[#2E434E] text-white rounded-[5px] px-6 py-3 text-sm font-semibold hover:bg-[#3A5162] transition-colors w-full sm:w-auto justify-center">
+            <button className="btn-sweep flex items-center gap-[5px] bg-[#2E434E] text-[#F8F9FA] rounded-[5px] px-[15px] py-[10px] text-[12px] font-semibold hover:bg-[#3A5162] transition-colors justify-center min-w-[180px]">
               <AppleIcon />
               Download for MacOS
             </button>
           </div>
 
           {/* Small text */}
-          <p className="text-[#94A0AA] text-[10px] tracking-widest uppercase">
-            NO CREDIT CARD &middot; 14-DAY TRIAL &middot; CANCEL ANYTIME
+          <p
+            className="hero-rise text-[#94A0AA] text-[12px] tracking-[1.5px] uppercase font-medium"
+            style={{ animationDelay: "360ms" }}
+          >
+            No credit card &middot; 14-day trial &middot; Cancel anytime
           </p>
         </div>
 
@@ -209,11 +116,66 @@ export default function Home() {
         <AppPreviewMockup />
       </div>
 
-      {/* Copyright */}
-      <footer className="pb-8 text-center">
-        <p className="text-[#6B7B86] text-[10px]">
-          © 2026 plinq. All rights reserved.
-        </p>
+      {/* Product landing sections */}
+      <ProductSection />
+
+      {/* Brand footer */}
+      <footer className="bg-[#16242E] text-white pt-16 sm:pt-20 pb-10 px-6 sm:px-10">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10 pb-12 border-b border-white/10">
+            <div className="flex flex-col gap-5 max-w-[460px]">
+              <Logo variant="light" size={42} />
+              <p
+                className="text-white text-[22px] sm:text-[26px] leading-[1.25] font-medium"
+                style={{ fontFamily: "Metropolis, Inter, sans-serif" }}
+              >
+                Your AI co-pilot for{" "}
+                <em
+                  className="not-italic italic text-[#5B7FB6]"
+                  style={{
+                    fontFamily: "Metropolis, Inter, sans-serif",
+                    fontStyle: "italic",
+                  }}
+                >
+                  every project.
+                </em>
+              </p>
+              <p className="text-[#94A0AA] text-[14px] leading-relaxed">
+                plinq turns conversation into a single execution system —
+                meetings, decisions, and tasks in one place.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-[13px]">
+              <div className="flex flex-col gap-2">
+                <p className="text-[#5B7FB6] text-[10px] uppercase tracking-[1.5px] font-semibold mb-1">
+                  Product
+                </p>
+                <Link href="/#product" className="text-[#94A0AA] hover:text-white transition-colors">Overview</Link>
+                <Link href="/#solution" className="text-[#94A0AA] hover:text-white transition-colors">Solution</Link>
+                <Link href="/#built-for" className="text-[#94A0AA] hover:text-white transition-colors">Built for</Link>
+                <Link href="/docs" className="text-[#94A0AA] hover:text-white transition-colors">Docs</Link>
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-[#5B7FB6] text-[10px] uppercase tracking-[1.5px] font-semibold mb-1">
+                  Contact
+                </p>
+                <a href="mailto:hello@plinq.app" className="text-[#94A0AA] hover:text-white transition-colors">hello@plinq.app</a>
+                <a href="#" className="text-[#94A0AA] hover:text-white transition-colors">Privacy</a>
+                <a href="#" className="text-[#94A0AA] hover:text-white transition-colors">Terms</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[12px] text-[#6B7B86]">
+            <p>© 2026 plinq. All rights reserved.</p>
+            <p>
+              Built by{" "}
+              <span className="text-[#94A0AA]">ieum</span> · KAIST MLAI Lab
+              · LLM Agent research
+            </p>
+          </div>
+        </div>
       </footer>
     </main>
   );
