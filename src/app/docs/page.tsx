@@ -611,7 +611,10 @@ function FaqSection() {
 
 export default function DocsPage() {
   return (
-    <main className="flex-1 flex flex-col bg-white min-h-screen">
+    <main
+  className="flex-1 flex flex-col bg-white min-h-screen"
+  style={{ ["--header-bg" as string]: "#ffffff" }}
+    >
       <Header />
 
       <div className="max-w-[1200px] w-full mx-auto px-6 sm:px-10 pt-6 sm:pt-10">
