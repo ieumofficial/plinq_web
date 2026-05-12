@@ -10,7 +10,7 @@ const navItems: { label: string; href: string }[] = [
 
 export default function Header() {
   return (
-    <header className="w-full px-6 sm:px-10 py-5 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full px-6 sm:px-10 py-5 flex items-center justify-between bg-white/80 backdrop-blur-md">
       <Link href="/">
         <Logo variant="dark" size={28} />
       </Link>
