@@ -288,26 +288,29 @@ export default function LoginPage() {
   // there before the listener attaches.
   useEffect(() => {
     let cancelled = false;
-    // getSession() trusts whatever is in localStorage and will happily
-    // return a stale session whose refresh token is already dead.
-    // getUser() validates against the server, so we only show the success
-    // screen for a session that can actually be handed to the desktop app.
+    // A still-valid (not-yet-expired) access token survives a logout:
+    // access JWTs are stateless and can't be individually revoked — only
+    // the refresh token is killed on sign-out. So getSession()/getUser()
+    // both happily report "logged in" for a session whose refresh token
+    // the server already invalidated, which is why the success screen
+    // flashed and then bounced back to email.
     //
-    // Depending on the supabase-js version, getUser() with no/dead session
-    // either returns { error } OR rejects with AuthSessionMissingError. An
-    // uncaught rejection is exactly what surfaces as the Next.js error
-    // overlay, so we await it inside try/catch and treat both the same.
+    // The only real proof the session is usable for the desktop hand-off
+    // is that the refresh token still works — so we actually attempt a
+    // refresh. Success ⇒ genuinely alive (and we now hold fresh tokens to
+    // hand over). Failure/throw ⇒ dead session ⇒ straight to login, with
+    // no success screen ever shown (so no flicker).
     void (async () => {
       try {
-        const { data, error } = await supabase.auth.getUser();
+        const { data, error } = await supabase.auth.refreshSession();
         if (cancelled) return;
-        if (!error && data.user?.email) {
-          setEmail(data.user.email);
+        if (!error && data.session?.user?.email) {
+          setEmail(data.session.user.email);
           setStep("success");
           return;
         }
       } catch {
-        /* no session / dead token — fall through to reset */
+        /* no session / dead refresh token — fall through to reset */
       }
       if (cancelled) return;
       // Logged out, or the token can't be refreshed — purge it so we
