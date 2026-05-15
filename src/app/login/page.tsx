@@ -244,6 +244,10 @@ export default function LoginPage() {
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // True while the mount-time refresh-token check is in flight, so we show
+  // a "checking…" spinner instead of flashing the email form → success.
+  const [checking, setChecking] = useState(true);
+
   const isOtpComplete = otpValues.every((v) => v !== "");
 
   const isCreateStep = step.startsWith("create-");
@@ -309,20 +313,24 @@ export default function LoginPage() {
           setStep("success");
           return;
         }
+        // Logged out, or the token can't be refreshed — purge it so we
+        // don't land back here on the next visit.
+        await resetToEmailStep();
       } catch {
-        /* no session / dead refresh token — fall through to reset */
+        if (cancelled) return;
+        await resetToEmailStep();
+      } finally {
+        if (!cancelled) setChecking(false);
       }
-      if (cancelled) return;
-      // Logged out, or the token can't be refreshed — purge it so we
-      // don't land back here on the next visit.
-      void resetToEmailStep();
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user?.email) {
         setEmail(session.user.email);
         setStep("success");
+        setChecking(false);
       } else if (event === "SIGNED_OUT") {
         clearAuthFields();
+        setChecking(false);
       }
     });
     return () => {
@@ -618,6 +626,16 @@ export default function LoginPage() {
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-10 overflow-y-auto">
         <div className="w-full max-w-[380px]">
+          {checking ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-24">
+              <span
+                className="inline-block w-8 h-8 rounded-full border-2 border-[#5B7FB6]/30 border-t-[#5B7FB6] animate-spin"
+                aria-hidden
+              />
+              <p className="text-[#94A0AA] text-[12px]">확인 중…</p>
+            </div>
+          ) : (
+            <>
           {renderHeader()}
 
           {/* Step 1: Email */}
@@ -993,6 +1011,8 @@ export default function LoginPage() {
                 </button>
               </p>
             </div>
+          )}
+            </>
           )}
         </div>
       </div>
