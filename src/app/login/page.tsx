@@ -31,14 +31,6 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11.5 9C11.5 7.1 13 6.2 13.1 6.1C12 4.5 10.3 4.3 9.7 4.3C8.3 4.2 6.9 5.2 6.2 5.2C5.5 5.2 4.3 4.3 3.1 4.3C1.6 4.4 0.2 5.3 0 7.1C-0.4 10.7 2.2 16.1 3.6 16.1C4.1 16.1 4.8 15.5 5.9 15.5C7 15.5 7.5 16.1 8.3 16.1C9.8 16 11.1 12.2 11.5 9ZM9.3 2.8C10.1 1.8 10.1 0.9 10.1 0.5C9.3 0.5 8.4 1.1 7.9 1.6C7.3 2.2 6.9 3 7 3.8C7.8 3.9 8.6 3.4 9.3 2.8Z" fill="white"/>
-    </svg>
-  );
-}
-
 function MailIcon() {
   return (
     <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -339,7 +331,7 @@ export default function LoginPage() {
     };
   }, [resetToEmailStep, clearAuthFields]);
 
-  const handleOAuthSignIn = async (provider: "google" | "apple") => {
+  const handleOAuthSignIn = async (provider: "google") => {
     setError("");
     setLoading(true);
     try {
@@ -359,8 +351,7 @@ export default function LoginPage() {
           // 'select_account' = pick from logged-in Google accounts (or add
           // a new one). 'consent' would also re-prompt for permissions —
           // overkill once the user has already granted them.
-          queryParams:
-            provider === "google" ? { prompt: "select_account" } : undefined,
+          queryParams: { prompt: "select_account" },
         },
       });
       if (oauthError) {
@@ -650,15 +641,6 @@ export default function LoginPage() {
               >
                 <GoogleIcon />
                 Continue with Google
-              </button>
-              <button
-                type="button"
-                onClick={() => handleOAuthSignIn("apple")}
-                disabled={loading}
-                className="flex items-center justify-center gap-3 w-full backdrop-blur-sm bg-white/10 rounded-[5px] px-4 py-3 text-white text-[14px] font-semibold hover:bg-white/15 transition-colors disabled:opacity-50"
-              >
-                <AppleIcon />
-                Continue with Apple
               </button>
 
               <Divider text="OR WITH EMAIL" />
