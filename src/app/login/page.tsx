@@ -248,6 +248,33 @@ export default function LoginPage() {
 
   const isCreateStep = step.startsWith("create-");
 
+  const clearAuthFields = useCallback(() => {
+    setStep("email");
+    setEmail("");
+    setPassword("");
+    setOtpValues(["", "", "", "", "", ""]);
+    setError("");
+    setFirstName("");
+    setLastName("");
+    setNickname("");
+    setRole("");
+    setSignupPassword("");
+    setConfirmPassword("");
+  }, []);
+
+  const resetToEmailStep = useCallback(async () => {
+    // Purge whatever is in localStorage so the mount-time session probe
+    // doesn't keep bouncing us into the success screen with a token that
+    // can't actually be refreshed. scope:"local" skips the network call
+    // (a global sign-out would itself throw on an already-dead token).
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch {
+      /* nothing to purge — already signed out */
+    }
+    clearAuthFields();
+  }, [clearAuthFields]);
+
   useEffect(() => {
     if (step === "otp" || step === "auth-method" || step === "password-error" || step === "new-user-otp") {
       setError("");
@@ -261,24 +288,45 @@ export default function LoginPage() {
   // there before the listener attaches.
   useEffect(() => {
     let cancelled = false;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      if (data.session?.user?.email) {
-        setEmail(data.session.user.email);
-        setStep("success");
+    // getSession() trusts whatever is in localStorage and will happily
+    // return a stale session whose refresh token is already dead.
+    // getUser() validates against the server, so we only show the success
+    // screen for a session that can actually be handed to the desktop app.
+    //
+    // Depending on the supabase-js version, getUser() with no/dead session
+    // either returns { error } OR rejects with AuthSessionMissingError. An
+    // uncaught rejection is exactly what surfaces as the Next.js error
+    // overlay, so we await it inside try/catch and treat both the same.
+    void (async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (!error && data.user?.email) {
+          setEmail(data.user.email);
+          setStep("success");
+          return;
+        }
+      } catch {
+        /* no session / dead token — fall through to reset */
       }
-    });
+      if (cancelled) return;
+      // Logged out, or the token can't be refreshed — purge it so we
+      // don't land back here on the next visit.
+      void resetToEmailStep();
+    })();
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user?.email) {
         setEmail(session.user.email);
         setStep("success");
+      } else if (event === "SIGNED_OUT") {
+        clearAuthFields();
       }
     });
     return () => {
       cancelled = true;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [resetToEmailStep, clearAuthFields]);
 
   const handleOAuthSignIn = async (provider: "google" | "apple") => {
     setError("");
@@ -906,9 +954,19 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={async () => {
-                  const { data: { session } } = await supabase.auth.getSession();
-                  if (session) {
-                    window.location.href = `plinq://auth?access_token=${session.access_token}&refresh_token=${session.refresh_token}`;
+                  try {
+                    const { data, error } = await supabase.auth.getSession();
+                    if (error || !data.session) {
+                      await resetToEmailStep();
+                      setError("Your session expired — please sign in again.");
+                      return;
+                    }
+                    window.location.href = `plinq://auth?access_token=${data.session.access_token}&refresh_token=${data.session.refresh_token}`;
+                  } catch {
+                    // getSession() throws AuthSessionMissingError when the
+                    // stored refresh token is dead. Fall back to re-login.
+                    await resetToEmailStep();
+                    setError("Your session expired — please sign in again.");
                   }
                 }}
                 className="w-full bg-white border border-[#E6EAEE] rounded-[10px] px-4 py-3 text-[#16242E] text-[12px] font-semibold hover:bg-white/90 transition-colors text-center cursor-pointer"
@@ -920,23 +978,11 @@ export default function LoginPage() {
                 Not {email}?{" "}
                 <button
                   type="button"
-                  onClick={async () => {
+                  onClick={() => {
                     // Clear the supabase session too, otherwise the
-                    // mount-time onAuthStateChange listener will read the
-                    // stale session on the next render and bounce us
-                    // straight back to the success step.
-                    await supabase.auth.signOut();
-                    setStep("email");
-                    setEmail("");
-                    setPassword("");
-                    setOtpValues(["", "", "", "", "", ""]);
-                    setError("");
-                    setFirstName("");
-                    setLastName("");
-                    setNickname("");
-                    setRole("");
-                    setSignupPassword("");
-                    setConfirmPassword("");
+                    // mount-time session probe reads the stale token and
+                    // bounces us straight back to the success step.
+                    void resetToEmailStep();
                   }}
                   className="text-[#5B7FB6] hover:underline"
                 >
