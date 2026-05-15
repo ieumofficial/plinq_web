@@ -294,6 +294,14 @@ export default function LoginPage() {
             typeof window !== "undefined"
               ? `${window.location.origin}/login`
               : undefined,
+          // Force Google to show its account picker. Without this, Google
+          // silently signs the user into whichever account is already
+          // active in the browser, which makes "switch account" impossible.
+          // 'select_account' = pick from logged-in Google accounts (or add
+          // a new one). 'consent' would also re-prompt for permissions —
+          // overkill once the user has already granted them.
+          queryParams:
+            provider === "google" ? { prompt: "select_account" } : undefined,
         },
       });
       if (oauthError) {
@@ -912,7 +920,12 @@ export default function LoginPage() {
                 Not {email}?{" "}
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
+                    // Clear the supabase session too, otherwise the
+                    // mount-time onAuthStateChange listener will read the
+                    // stale session on the next render and bounce us
+                    // straight back to the success step.
+                    await supabase.auth.signOut();
                     setStep("email");
                     setEmail("");
                     setPassword("");
