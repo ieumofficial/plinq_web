@@ -254,6 +254,60 @@ export default function LoginPage() {
     }
   }, [step]);
 
+  // After an OAuth round-trip, supabase-js parses the hash fragment on
+  // mount and sets the session. We listen for SIGNED_IN once and jump to
+  // the success step (which exposes the deep-link button to bounce back to
+  // the desktop app). Also handles the case where the session is already
+  // there before the listener attaches.
+  useEffect(() => {
+    let cancelled = false;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session?.user?.email) {
+        setEmail(data.session.user.email);
+        setStep("success");
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user?.email) {
+        setEmail(session.user.email);
+        setStep("success");
+      }
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleOAuthSignIn = async (provider: "google" | "apple") => {
+    setError("");
+    setLoading(true);
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          // Provider redirects back to /login; the mount-time session
+          // listener above picks the new session up and advances to the
+          // success step so the user can bounce into the desktop app.
+          redirectTo:
+            typeof window !== "undefined"
+              ? `${window.location.origin}/login`
+              : undefined,
+        },
+      });
+      if (oauthError) {
+        setError(oauthError.message);
+        setLoading(false);
+      }
+      // If no error, the browser is already navigating away to the
+      // provider — leave loading=true so the button stays disabled.
+    } catch {
+      setError(`Failed to start ${provider} sign-in.`);
+      setLoading(false);
+    }
+  };
+
   // --- Handlers ---
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -513,14 +567,18 @@ export default function LoginPage() {
               {/* OAuth buttons */}
               <button
                 type="button"
-                className="flex items-center justify-center gap-3 w-full backdrop-blur-sm bg-white/10 rounded-[5px] px-4 py-3 text-white text-[14px] font-semibold hover:bg-white/15 transition-colors"
+                onClick={() => handleOAuthSignIn("google")}
+                disabled={loading}
+                className="flex items-center justify-center gap-3 w-full backdrop-blur-sm bg-white/10 rounded-[5px] px-4 py-3 text-white text-[14px] font-semibold hover:bg-white/15 transition-colors disabled:opacity-50"
               >
                 <GoogleIcon />
                 Continue with Google
               </button>
               <button
                 type="button"
-                className="flex items-center justify-center gap-3 w-full backdrop-blur-sm bg-white/10 rounded-[5px] px-4 py-3 text-white text-[14px] font-semibold hover:bg-white/15 transition-colors"
+                onClick={() => handleOAuthSignIn("apple")}
+                disabled={loading}
+                className="flex items-center justify-center gap-3 w-full backdrop-blur-sm bg-white/10 rounded-[5px] px-4 py-3 text-white text-[14px] font-semibold hover:bg-white/15 transition-colors disabled:opacity-50"
               >
                 <AppleIcon />
                 Continue with Apple
